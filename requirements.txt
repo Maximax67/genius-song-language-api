@@ -1,4 +1,4 @@
-aiohttp
 fastapi
 python-dotenv
+requests
 uvicorn

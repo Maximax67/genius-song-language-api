@@ -9,21 +9,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-AIOHTTP_SESSION = None
 GENIUS_API_TOKEN = os.getenv("GENIUS_API_TOKEN")
+AIOHTTP_SESSION = aiohttp.ClientSession(
+    headers={
+        "Authorization": f"Bearer {GENIUS_API_TOKEN}"
+    }
+)
 
 app = FastAPI()
-
-@app.on_event("startup")
-async def startup_event():
-    global AIOHTTP_SESSION
-    if AIOHTTP_SESSION is None:
-        AIOHTTP_SESSION = aiohttp.ClientSession(
-            headers={
-                "Authorization": f"Bearer {GENIUS_API_TOKEN}"
-            }
-        )
-
 
 @app.on_event("shutdown")
 async def shutdown_event():

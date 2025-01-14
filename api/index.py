@@ -9,14 +9,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+AIOHTTP_SESSION = None
 GENIUS_API_TOKEN = os.getenv("GENIUS_API_TOKEN")
-AIOHTTP_SESSION = aiohttp.ClientSession(
-    headers={
-        "Authorization": f"Bearer {GENIUS_API_TOKEN}"
-    }
-)
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    global AIOHTTP_SESSION
+    if AIOHTTP_SESSION is None:
+        AIOHTTP_SESSION = aiohttp.ClientSession(
+            headers={
+                "Authorization": f"Bearer {GENIUS_API_TOKEN}"
+            }
+        )
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -47,6 +54,7 @@ async def get_song_language(name: str) -> str | None:
 
 
 async def _search(name: str) -> dict:
+    global AIOHTTP_SESSION
     url = "https://api.genius.com/search?q=" + quote_plus(name)
     async with AIOHTTP_SESSION.get(url) as res:
         res.raise_for_status()
@@ -62,6 +70,7 @@ def _get_song_section(sections: dict) -> dict:
 
 
 async def _get_song_json(id: int) -> str:
+    global AIOHTTP_SESSION
     url = f"https://api.genius.com/songs/{id}"
     async with AIOHTTP_SESSION.get(url) as res:
         res.raise_for_status()

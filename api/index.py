@@ -90,4 +90,4 @@ async def search(q: str = Query(..., description="Name of the song")):
         raise HTTPException(status_code=404, detail="Song not found")
     except Exception as e:
         logging.exception(e)
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail=str(e))
